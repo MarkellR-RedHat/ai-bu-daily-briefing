@@ -1,10 +1,39 @@
 # ai-bu-daily-briefing
 
-It is 8:47 AM. You have a standup in 13 minutes. What happened yesterday?
+**Stop tab-juggling GitHub every morning. Get your whole day on one screen.**
 
-You could open GitHub. Scan 12 notifications. Cross-reference 4 repos. Check which PRs need your review, which ones you already reviewed, which issues moved. Tab back to Slack to see if anyone pinged you. Tab back to GitHub. Try to remember what you actually shipped versus what you just looked at.
+You have a standup in 13 minutes. What happened yesterday?
 
-Or you could type `/briefing` and get this:
+You open GitHub. Twelve notifications. You scan each one, open four tabs, cross-reference PRs across two repos, try to remember what you shipped versus what you just looked at. You tab over to Slack to see if anyone pinged you. Tab back. Forget about the issue that got labeled urgent while you were asleep. Show up to standup and say "uh, I worked on the autoscaler thing."
+
+There is a better way.
+
+## Quick start
+
+```bash
+# Install (30 seconds)
+git clone https://github.com/MarkellR-RedHat/ai-bu-daily-briefing.git
+cd ai-bu-daily-briefing
+bash install.sh
+
+# Your first command (inside Claude Code)
+/briefing
+```
+
+That is it. Seven slash commands get installed to `~/.claude/commands/`. Run them inside any Claude Code session.
+
+## Before and after
+
+| | Before | After |
+|---|---|---|
+| **Morning prep** | Open GitHub, scan 12 notifications, open 4 tabs, cross-reference 2 repos, forget the urgent issue | Type `/briefing`, read one screen, see everything prioritized |
+| **Standup** | Scramble to reconstruct yesterday from memory | Type `/standup`, paste 3 clean sections into Slack |
+| **After PTO** | Spend an hour reading through days of notifications | Type `/catch-me-up 3`, get action items first |
+| **Total time** | 15-20 minutes | 90 seconds |
+
+## What you get
+
+Type `/briefing` and see this:
 
 ```
 DAILY BRIEFING - 2026-06-26
@@ -42,23 +71,19 @@ TEAM ACTIVITY (last 24h)
 
 One screen. Prioritized. Every link pulled live from the GitHub API. You walk into standup knowing exactly what matters.
 
-## Your morning, before and after
+## Commands
 
-**Before**: Open GitHub. 12 notifications. Scan each one. Open 4 tabs. Check PRs in two repos. Try to figure out which reviews are waiting on you versus which ones you already did. Forget about the issue that got labeled urgent while you were asleep. Show up to standup and say "uh, I worked on the autoscaler thing."
+| Command | What it does | Key flags |
+|---|---|---|
+| `/briefing` | Morning briefing: notifications, PRs, issues, team activity | `--org` `--repo` `--verbose` |
+| `/standup` | Standup prep: yesterday, today, blockers (under 25 lines) | `--org` `--repo` `--days N` |
+| `/weekly-digest` | End-of-week summary for status updates or your manager | `--org` `--repo` `--weeks N` |
+| `/team-pulse` | Org health check: review bottlenecks, aging PRs, concentration risk | `--org` (required) `--team` `--days N` |
+| `/catch-me-up` | Return-from-absence briefing: action items first, then context | `<days>` (required) `--org` `--repo` |
+| `/risk-radar` | Early warning scanner: stale PRs, CI failures, dependency alerts | `--org` `--repo` `--days N` `--severity` |
+| `/week-ahead` | Monday planner: quick wins first, then time bombs | `--org` `--repo` `--include-team` |
 
-**After**: Type `/briefing`. Read one screen. See that you have an approved PR ready to merge, a stale review you forgot about, and an urgent issue. Type `/standup`. Get three clean sections you can paste into Slack. Walk into the meeting prepared.
-
-Total time: 90 seconds.
-
-## Seven commands for your entire week
-
-### `/briefing` - Your morning chief of staff
-
-Pulls notifications, review requests, open PRs, assigned issues, and team activity. Prioritizes by urgency. Fits on one terminal screen. If nothing is on fire, it says so. Knowing nothing is urgent is useful information on its own.
-
-### `/standup` - Talk points, not a to-do list
-
-Three sections: yesterday, today, blockers. Under 25 lines. Ordered by impact, not chronology. The "today" section puts the thing that unblocks the most people first. Paste it into Slack and go.
+### `/standup` output
 
 ```
 STANDUP - 2026-06-26 (Thursday)
@@ -79,13 +104,7 @@ BLOCKERS:
   Prefill pod autoscaler (RedHatAI/llm-d) - waiting 4d for review
 ```
 
-### `/weekly-digest` - Your week, summarized honestly
-
-End-of-week summary for your manager, your team, or yourself. Leads with a one-line summary ("4 shipped, 6 reviewed, 3 issues closed, 2 carrying over") so anyone skimming gets the picture in 3 seconds.
-
-### `/team-pulse` - Built for leads
-
-Shows which repos are active, which PRs are aging, and where review bottlenecks are forming. Surfaces patterns, not judgments. Finds the PR that has been open for 12 days with no review so you can ask "does someone need to pick this up?" instead of discovering it during a production incident.
+### `/team-pulse` output
 
 ```
 TEAM PULSE - RedHatAI - Jun 20 to Jun 27
@@ -102,24 +121,7 @@ AGING PRs (4 needing attention)
     https://github.com/RedHatAI/vllm/pull/79
 ```
 
-### `/catch-me-up` - You were out. Here is what you missed.
-
-Back from PTO? Out sick? Three days of back-to-back meetings? Tell it how long you were gone. It collapses everything into three sections: what needs your action, what changed direction, and what shipped. Stop reading after section one if you are in a hurry.
-
-```
-CATCH-UP BRIEFING - Jun 23 to Jun 26 (3 days)
-============================================================
-
-ACT ON THIS (4 items waiting on you)
-  Review requested: Fix memory leak in scheduler (RedHatAI/llm-d) - opened 2d ago
-    https://github.com/RedHatAI/llm-d/pull/142
-  Changes requested on your PR: Prefill pod autoscaler (RedHatAI/llm-d)
-    https://github.com/RedHatAI/llm-d/pull/145
-```
-
-### `/risk-radar` - Early warning signs
-
-Scans for the things busy people miss: PRs rotting without review, CI failures on main, dependency vulnerabilities, unsustainable commit patterns. Assigns severity (HIGH/MEDIUM/LOW). Presents findings as observations, not judgments.
+### `/risk-radar` output
 
 ```
 RISK RADAR - 2026-06-26 - RedHatAI
@@ -131,45 +133,29 @@ HIGH SEVERITY
   [SECURITY] RedHatAI/vllm: 2 critical dependency alerts (torch: arbitrary code execution)
 ```
 
-### `/week-ahead` - Plan your week with data
+## Shell aliases
 
-Forward-looking only. Starts with quick wins (approved PRs you can merge right now), lays out the week's work, then warns about time bombs (the PR about to go stale, the milestone coming due). Replaces Monday morning dread with a clear sequence.
+The installer can add these aliases to your `.zshrc` or `.bashrc`. They run from any terminal, no active Claude Code session needed.
 
-## Commands Reference
-
-| Command | Purpose | Key flags |
-|---------|---------|-----------|
-| `/briefing` | Morning briefing with prioritized notifications, PRs, issues | `--org` `--repo` `--verbose` |
-| `/standup` | Standup prep: yesterday, today, blockers | `--org` `--repo` `--days N` |
-| `/weekly-digest` | Week-in-review summary for status updates | `--org` `--repo` `--weeks N` |
-| `/team-pulse` | Org/team health check for leads | `--org` (required) `--team` `--days N` |
-| `/catch-me-up` | Return-from-absence briefing | `<days>` (required) `--org` `--repo` |
-| `/risk-radar` | Risk and warning scanner | `--org` `--repo` `--days N` `--severity` |
-| `/week-ahead` | Forward-looking week planner | `--org` `--repo` `--include-team` |
-
-## Shell Aliases
-
-Run these from any terminal, no Claude Code session needed.
-
-| Alias | Runs |
-|-------|------|
-| `morning` | `/briefing` |
-| `standup` | `/standup` |
-| `weekly` | `/weekly-digest` |
-| `pulse` | `/team-pulse` |
-| `catchmeup` | `/catch-me-up` |
-| `riskradar` | `/risk-radar` |
-| `weekahead` | `/week-ahead` |
-| `prs` | List PRs needing your review (gh directly) |
-| `greview` | Interactive PR review picker with fzf |
-| `prs-stale` | PRs open >7 days requesting your review |
-| `myissues` | Your assigned issues across repos |
+| Alias | Runs | Notes |
+|---|---|---|
+| `morning` | `/briefing` | Full morning briefing |
+| `standup` | `/standup` | Standup prep |
+| `weekly` | `/weekly-digest` | End-of-week summary |
+| `pulse` | `/team-pulse` | Team health check |
+| `catchmeup` | `/catch-me-up` | Return-from-absence briefing |
+| `riskradar` | `/risk-radar` | Risk and warning scanner |
+| `weekahead` | `/week-ahead` | Forward-looking planner |
+| `prs` | `gh search prs` | PRs needing your review |
+| `greview` | `gh` + `fzf` | Interactive PR picker (requires fzf) |
+| `prs-stale` | `gh search prs` | PRs open >7 days |
+| `myissues` | `gh search issues` | Your assigned issues |
 
 ## Prerequisites
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
-- [GitHub CLI (`gh`)](https://cli.github.com/) installed and authenticated
-- [fzf](https://github.com/junegunn/fzf) (optional, enables `greview` interactive picker)
+- **Claude Code CLI** - [install guide](https://docs.anthropic.com/en/docs/claude-code) (must be authenticated)
+- **GitHub CLI (`gh`)** - [install guide](https://cli.github.com/) (must be authenticated)
+- **fzf** - [install guide](https://github.com/junegunn/fzf) (optional, enables `greview` interactive picker)
 
 ## Install
 
@@ -179,7 +165,7 @@ cd ai-bu-daily-briefing
 bash install.sh
 ```
 
-The installer copies all seven commands to `~/.claude/commands/` and optionally adds shell aliases to your `.zshrc` or `.bashrc`. Checks prerequisites, detects existing commands, and updates changed ones.
+The installer checks prerequisites, copies all seven commands to `~/.claude/commands/`, and optionally adds shell aliases to your `.zshrc` or `.bashrc`. It detects existing commands and only updates changed ones.
 
 ### Manual install
 
@@ -193,19 +179,11 @@ source /path/to/ai-bu-daily-briefing/shell/briefing-aliases.sh
 
 ## Customization
 
-### Filtering by org or repo
+**Filtering by org or repo.** All commands accept `--org` to limit results to one GitHub organization or `--repo` to focus on a single repository.
 
-All commands accept `--org` to limit results to one GitHub organization or `--repo` to focus on a single repository.
+**Stale thresholds.** PRs open >7 days are flagged as STALE. Issues open >14 days are flagged as OLD. These thresholds are defined in each command file and can be edited to match your team's norms.
 
-### Stale thresholds
-
-- PRs open > 7 days are flagged as STALE
-- Issues open > 14 days are flagged as OLD
-- These thresholds are defined in each command file and can be edited to match your team's norms
-
-### Adding new commands
-
-Command files are plain Markdown with structured prompts for Claude. See `reference/briefing-format.md` for formatting conventions. Add a new `.md` file to `commands/`, update the `COMMANDS` array in `install.sh`, and re-run the installer.
+**Adding new commands.** Command files are plain Markdown with structured prompts for Claude. See `reference/briefing-format.md` for formatting conventions. Add a new `.md` file to `commands/`, update the `COMMANDS` array in `install.sh`, and re-run the installer.
 
 ## How it works
 
