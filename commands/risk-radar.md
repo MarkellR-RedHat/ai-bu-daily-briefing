@@ -118,6 +118,57 @@ Before printing:
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
 
+## Calibration Examples
+
+### BAD: Risk finding (alarmist, judgmental)
+```
+HIGH SEVERITY
+  [TEAM] RedHatAI/llm-d: Developer @jsmith is working excessive hours!
+    15 commits made outside business hours this sprint. This is unsustainable.
+  [PROCESS] RedHatAI/vllm: The team is not keeping up with reviews!
+    Multiple PRs have been ignored and are now stale.
+```
+Why it is bad: Assigns blame ("@jsmith is working excessive hours"), makes judgments ("unsustainable," "ignored"), and uses exclamation points. A lead reading this feels like they are getting a performance complaint, not a health check.
+
+### GOOD: Risk finding (factual, observation-only)
+```
+HIGH SEVERITY
+  [PROCESS] RedHatAI/llm-d: PR "KV cache eviction policy" open 12d with no review
+    https://github.com/RedHatAI/llm-d/pull/119
+    Merge conflict risk increases daily. Original author has not rebased since opening.
+
+MEDIUM SEVERITY
+  [TEAM] RedHatAI/llm-d: 12 after-hours commits across 3 contributors this period
+  [TEAM] RedHatAI/vllm: 85% of commits from single contributor (bus factor = 1)
+```
+Why it is good: States facts without judging people. "12d with no review" is a process observation. "Bus factor = 1" names the risk without naming the person. A lead can act on this without anyone feeling called out.
+
+### BAD: Summary line (vague severity)
+```
+Summary: Several high-priority risks detected across your repositories. Some items need immediate attention.
+```
+Why it is bad: "Several" and "some" are weasel words. The lead still does not know how many or how bad.
+
+### GOOD: Summary line (precise counts)
+```
+Summary: 2 HIGH, 3 MEDIUM, 4 LOW
+```
+Why it is good: The lead knows the scope instantly. Two sentences of context at most, then straight to findings.
+
+### BAD: Security finding (fabricated data)
+```
+  [SECURITY] RedHatAI/llm-d: Critical vulnerability in torch (CVE-2025-12345)
+    Immediate action required. Your production systems may be at risk.
+```
+Why it is bad: If the Dependabot API did not return this data, it is fabricated. "May be at risk" is speculation.
+
+### GOOD: Security finding (API-sourced, factual)
+```
+  [SECURITY] RedHatAI/vllm: 2 critical dependency alerts (torch: arbitrary code execution)
+    https://github.com/RedHatAI/vllm/security/dependabot/1
+```
+Why it is good: Data comes directly from the Dependabot API. Links to the actual alert. No speculation about impact.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT frame after-hours work as inherently bad. Note the pattern, do not judge it.
@@ -127,6 +178,7 @@ Before printing:
 - DO NOT suggest specific actions ("you should talk to X"). Present findings and let the lead decide.
 - DO NOT include risks that are already resolved (e.g., a CI failure that was fixed in a subsequent commit).
 - DO NOT be alarmist. A calm, factual tone builds more trust than exclamation points.
+- DO NOT say "immediate action required." State the finding and its severity. The lead decides what is immediate.
 
 ## Output Format
 

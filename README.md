@@ -40,7 +40,7 @@ TEAM ACTIVITY (last 24h)
   RedHatAI/vllm: 1 PR merged
 ```
 
-One screen. Prioritized. Every link is real, pulled live from the GitHub API. You walk into standup knowing exactly what matters.
+One screen. Prioritized. Every link pulled live from the GitHub API. You walk into standup knowing exactly what matters.
 
 ## Your morning, before and after
 
@@ -54,7 +54,7 @@ Total time: 90 seconds.
 
 ### `/briefing` - Your morning chief of staff
 
-The daily command. Pulls your notifications, review requests, open PRs, assigned issues, and team activity. Prioritizes by urgency. Fits on one terminal screen. If nothing is on fire, it says so, because knowing nothing is urgent is itself useful information.
+Pulls notifications, review requests, open PRs, assigned issues, and team activity. Prioritizes by urgency. Fits on one terminal screen. If nothing is on fire, it says so. Knowing nothing is urgent is useful information on its own.
 
 ### `/standup` - Talk points, not a to-do list
 
@@ -81,11 +81,11 @@ BLOCKERS:
 
 ### `/weekly-digest` - Your week, summarized honestly
 
-End-of-week summary for your manager, your team, or your own records. Leads with a one-line summary ("4 shipped, 6 reviewed, 3 issues closed, 2 carrying over") so anyone skimming gets the picture immediately.
+End-of-week summary for your manager, your team, or yourself. Leads with a one-line summary ("4 shipped, 6 reviewed, 3 issues closed, 2 carrying over") so anyone skimming gets the picture in 3 seconds.
 
 ### `/team-pulse` - Built for leads
 
-Shows which repos are active, which PRs are aging, and where review bottlenecks are forming. Surfaces patterns without making judgments. Finds the PR that has been open for 12 days with no review so you can ask "does someone need to pick this up?" instead of discovering it during a production incident.
+Shows which repos are active, which PRs are aging, and where review bottlenecks are forming. Surfaces patterns, not judgments. Finds the PR that has been open for 12 days with no review so you can ask "does someone need to pick this up?" instead of discovering it during a production incident.
 
 ```
 TEAM PULSE - RedHatAI - Jun 20 to Jun 27
@@ -104,7 +104,7 @@ AGING PRs (4 needing attention)
 
 ### `/catch-me-up` - You were out. Here is what you missed.
 
-Back from PTO? Out sick? Three days of meetings? Tell it how long you were gone and it collapses everything into three sections: what needs your action, what changed direction, and what shipped. Structured so you can stop reading after section one if you are in a hurry.
+Back from PTO? Out sick? Three days of back-to-back meetings? Tell it how long you were gone. It collapses everything into three sections: what needs your action, what changed direction, and what shipped. Stop reading after section one if you are in a hurry.
 
 ```
 CATCH-UP BRIEFING - Jun 23 to Jun 26 (3 days)
@@ -119,7 +119,7 @@ ACT ON THIS (4 items waiting on you)
 
 ### `/risk-radar` - Early warning signs
 
-Scans your repos for the things busy people miss: PRs rotting without review, CI failures on main, dependency vulnerabilities, unsustainable commit patterns. Assigns severity levels (HIGH/MEDIUM/LOW) and presents findings as observations, not judgments.
+Scans for the things busy people miss: PRs rotting without review, CI failures on main, dependency vulnerabilities, unsustainable commit patterns. Assigns severity (HIGH/MEDIUM/LOW). Presents findings as observations, not judgments.
 
 ```
 RISK RADAR - 2026-06-26 - RedHatAI
@@ -133,7 +133,7 @@ HIGH SEVERITY
 
 ### `/week-ahead` - Plan your week with data
 
-Forward-looking. Starts with quick wins (approved PRs you can merge right now), then lays out the week's work, then warns you about time bombs (the PR about to go stale, the milestone coming due). Replaces Monday morning dread with a clear sequence.
+Forward-looking only. Starts with quick wins (approved PRs you can merge right now), lays out the week's work, then warns about time bombs (the PR about to go stale, the milestone coming due). Replaces Monday morning dread with a clear sequence.
 
 ## Commands Reference
 
@@ -179,7 +179,7 @@ cd ai-bu-daily-briefing
 bash install.sh
 ```
 
-The installer copies all seven commands to `~/.claude/commands/` and optionally adds shell aliases to your `.zshrc` or `.bashrc`. It checks for prerequisites, detects existing commands, and updates them if they have changed.
+The installer copies all seven commands to `~/.claude/commands/` and optionally adds shell aliases to your `.zshrc` or `.bashrc`. Checks prerequisites, detects existing commands, and updates changed ones.
 
 ### Manual install
 
@@ -209,13 +209,12 @@ Command files are plain Markdown with structured prompts for Claude. See `refere
 
 ## How it works
 
-Each command is a Markdown file containing a structured prompt that tells Claude how to:
+Each command is a Markdown file with a structured prompt that tells Claude to:
 1. Run `gh` CLI commands to pull live data from the GitHub API
-2. Analyze and cross-reference the results
-3. Prioritize by urgency, not just recency
-4. Format into a consistent, scannable briefing
+2. Cross-reference and prioritize by urgency, not recency
+3. Format into a consistent, scannable briefing
 
-No data is stored locally. Everything is fetched live on each run. No API keys beyond what `gh` and `claude` already have.
+Nothing stored locally. Everything fetched live on each run. No API keys beyond what `gh` and `claude` already have.
 
 ## License
 

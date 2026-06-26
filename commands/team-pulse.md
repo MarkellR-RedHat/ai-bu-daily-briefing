@@ -102,6 +102,65 @@ Before printing:
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
 
+## Calibration Examples
+
+### BAD: Health signals (judgmental, prescriptive)
+```
+HEALTH SIGNALS
+  The team is falling behind on reviews. Several developers have not been reviewing PRs in a timely manner.
+  Productivity has declined compared to last week, with fewer PRs being merged.
+  You should consider holding a retrospective to address the review bottleneck.
+```
+Why it is bad: "Falling behind" is a judgment. "Several developers" assigns blame without naming a process problem. "You should consider" prescribes action. This reads like a performance review, not a health check.
+
+### GOOD: Health signals (observation-only, data-backed)
+```
+HEALTH SIGNALS
+  Review bottleneck: 40% of open PRs in llm-d have no review after 3d (4 of 10)
+  Concentration risk: 70% of vllm commits from single contributor (bus factor)
+  Merge queue healthy: llm-d merged 12 PRs this week vs. 8 open (good throughput)
+```
+Why it is good: Every signal has a number attached. The bottleneck is described as a process observation, not a people problem. Good news is included too, because a lead needs to know what is working, not just what is broken.
+
+### BAD: Contributor activity (surveillance report)
+```
+CONTRIBUTORS (last 7d)
+  @alice: 5 opened, 4 merged (strong performer)
+  @bob: 2 opened, 1 merged (needs improvement)
+  @carol: 0 opened, 0 merged (inactive - may need attention)
+```
+Why it is bad: "Strong performer," "needs improvement," and "inactive" are judgments. Carol might be on PTO, doing design work, or in incident response. This is a surveillance report disguised as data.
+
+### GOOD: Contributor activity (counts only, no judgment)
+```
+CONTRIBUTORS (last 7d, showing top 5)
+  @alice: 5 opened, 4 merged
+  @bob: 2 opened, 1 merged
+  @dave: 3 opened, 3 merged
+  @eve: 1 opened, 1 merged
+  [+4 more with activity]
+```
+Why it is good: Pure counts. No adjectives. The lead knows their team and can interpret these numbers in context that no tool has access to.
+
+### BAD: Aging PRs (generic)
+```
+AGING PRs (needing attention)
+  There are several PRs that have been open for a while and should be reviewed soon.
+```
+Why it is bad: "Several," "a while," and "should be reviewed soon" are all vague. The lead cannot act on this.
+
+### GOOD: Aging PRs (specific, linked)
+```
+AGING PRs (3 needing attention)
+  RedHatAI/llm-d: KV cache eviction policy (12d) by @aconrad - no review
+    https://github.com/RedHatAI/llm-d/pull/119
+  RedHatAI/vllm: Async tokenizer pipeline (11d) by @yli - changes requested, no re-review
+    https://github.com/RedHatAI/vllm/pull/79
+  RedHatAI/llm-d: Scheduler fairness policy (8d) by @kmurphy - no review
+    https://github.com/RedHatAI/llm-d/pull/125
+```
+Why it is good: Each PR has an age, an author, a status, and a link. The lead can scan this in 10 seconds and decide which one to act on first.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT make performance judgments about individuals. Report activity counts. Let the lead interpret.
@@ -110,6 +169,7 @@ Before printing:
 - DO NOT list every PR in a repo. Summarize counts, then only individually list the aging/stuck ones.
 - DO NOT suggest management actions ("you should talk to X about their output"). Surface data, not advice.
 - DO NOT make this feel like a performance review. It is a health check.
+- DO NOT use adjectives like "concerning," "worrying," or "disappointing." State the numbers and let the lead form opinions.
 
 ## Output Format
 

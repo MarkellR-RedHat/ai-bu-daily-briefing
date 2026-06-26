@@ -81,6 +81,69 @@ Before printing, verify:
 - Every URL is real and came from the `gh` output. Never fabricate links.
 - If there are genuinely no urgent items, start with a clear "no fires" statement. That is not filler. That is the most important information you can deliver on a good day.
 
+## Calibration Examples
+
+These show the difference between bad output and good output. Study these before generating anything.
+
+### BAD: Notification entry (vague, equal weight)
+```
+  review_requested: Update configuration (RedHatAI/llm-d)
+  mention: Discussion about improvements (RedHatAI/vllm)
+  review_requested: Various fixes (RedHatAI/llm-d)
+```
+Why it is bad: "Update configuration" and "Various fixes" tell the reader nothing. They still have to click through to know if this matters.
+
+### GOOD: Notification entry (specific, differentiated)
+```
+  review_requested: Fix OOM in batch inference for >32k context (RedHatAI/llm-d)
+  mention: Tracking issue for v0.5 milestone, 3 items still open (RedHatAI/llm-d)
+  review_requested: Bump vLLM to 0.4.2 (RedHatAI/vllm)
+```
+Why it is good: Each line gives enough context to decide whether to act now or later without clicking anything.
+
+### BAD: PR status (missing context)
+```
+MY OPEN PRs (3)
+  RedHatAI/llm-d: Autoscaler changes
+    https://github.com/RedHatAI/llm-d/pull/145
+  RedHatAI/llm-d: Shutdown handler
+    https://github.com/RedHatAI/llm-d/pull/138
+  RedHatAI/vllm: Tokenizer update
+    https://github.com/RedHatAI/vllm/pull/91
+```
+Why it is bad: No review status, no age, no indication of what to do next. This is just a list, not a briefing.
+
+### GOOD: PR status (actionable, prioritized)
+```
+MY OPEN PRs (3)
+  RedHatAI/llm-d: Add graceful shutdown handler APPROVED
+    https://github.com/RedHatAI/llm-d/pull/138
+    Ready to merge. Free win, ship it first thing.
+  RedHatAI/llm-d: Prefill pod autoscaler WAITING FOR REVIEW
+    https://github.com/RedHatAI/llm-d/pull/145
+    No review activity in 4d. Ping @reviewer or it goes stale Friday.
+  RedHatAI/vllm: Update tokenizer config CHANGES REQUESTED
+    https://github.com/RedHatAI/vllm/pull/91
+    @reviewer left 2 comments on error handling. Address before EOD.
+```
+Why it is good: Every PR has a status, a recommended action, and enough context to decide priority without opening GitHub.
+
+### BAD: Overall tone (report generator)
+```
+DAILY BRIEFING - 2026-06-26
+================================
+Below is a summary of your GitHub activity for today. There are several items that may require your attention across multiple repositories.
+```
+Why it is bad: "Summary of your GitHub activity" is noise. "Several items that may require attention" says nothing.
+
+### GOOD: Overall tone (chief of staff)
+```
+DAILY BRIEFING - 2026-06-26
+================================
+One thing matters today: the scheduler memory leak PR has been waiting on your review for 4 days and it is blocking @alice. Everything else is tracking normally.
+```
+Why it is good: Leads with the single most important thing. The reader knows what to do before they even scroll down.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT list PRs without stating their review status and age.
@@ -92,6 +155,7 @@ Before printing, verify:
 - DO NOT use em dashes anywhere in the output.
 - DO NOT give every item equal weight. If one thing is clearly more important, say so. "This is your highest priority today" is allowed. Encouraged, even.
 - DO NOT hedge. "You might want to look at this" is weak. "This PR is blocking @alice and has been open for 5 days" is clear.
+- DO NOT say "here is your briefing" or "below is a summary." Just start with the most important thing.
 
 ## Output Format
 

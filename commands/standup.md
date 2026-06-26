@@ -83,6 +83,63 @@ Before printing:
 - Does the "today" section read like a plan with a clear first move? If everything seems equal priority, you have not thought hard enough.
 - No em dashes anywhere.
 
+## Calibration Examples
+
+### BAD: Yesterday section (vague, padded)
+```
+YESTERDAY:
+  Worked on the autoscaler PR
+  Did some code reviews
+  Looked into the CI issue
+  Had meetings about the release
+```
+Why it is bad: "Worked on," "did some," "looked into" are filler. Nobody knows what actually happened. This makes the person sound like they were busy but shipped nothing.
+
+### GOOD: Yesterday section (specific, outcome-oriented)
+```
+YESTERDAY:
+  Merged: Add graceful shutdown handler (RedHatAI/llm-d)
+  Reviewed: Fix OOM on long-context inputs (RedHatAI/vllm)
+  Updated: Prefill pod autoscaler (RedHatAI/llm-d) - rebased, fixed race condition in scale-down
+```
+Why it is good: Every bullet names a specific action and a specific artifact. The team knows exactly what shipped and what moved.
+
+### BAD: Today section (wish list, no priority)
+```
+TODAY:
+  Continue working on autoscaler
+  Review some PRs
+  Look at assigned issues
+  Maybe start on the runbook
+```
+Why it is bad: No priority order. "Continue working on" and "look at" are non-commitments. "Maybe" is hedge. This is a vague to-do list, not a plan.
+
+### GOOD: Today section (ordered by impact, decisive)
+```
+TODAY:
+  Ship: Add graceful shutdown handler (RedHatAI/llm-d) - approved, merge first thing
+  Review: Fix memory leak in scheduler (RedHatAI/llm-d) - @alice waiting 4d
+  Continue: Prefill pod autoscaler (RedHatAI/llm-d) - addressing review comments
+  Pick up: Write runbook for scaling prefill pods (RedHatAI/llm-d) [urgent]
+```
+Why it is good: Ordered by what unblocks the most people. The merge is first because it is free progress. The review is second because someone is blocked. The person sounds like they know exactly what matters.
+
+### BAD: Blockers section (vague, passive)
+```
+BLOCKERS:
+  Waiting on some reviews
+  CI might be an issue
+  Need to sync with the team about priorities
+```
+Why it is bad: "Some reviews" from who? "Might be" is not a blocker. "Need to sync" is not a blocker, it is a calendar item. None of this is actionable by a teammate.
+
+### GOOD: Blockers section (precise, names the dependency)
+```
+BLOCKERS:
+  Prefill pod autoscaler (RedHatAI/llm-d) - waiting 4d for review, no reviewers assigned
+```
+Why it is good: Names the exact PR, the exact duration, and the exact problem. A lead reading this can immediately assign a reviewer.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT start bullets with "I" - use the action: "Merged," "Reviewed," "Pushed," not "I merged," "I reviewed."
@@ -91,6 +148,7 @@ Before printing:
 - DO NOT pad empty sections. "Nothing" on one line. Move on.
 - DO NOT add a greeting, sign-off, or motivational note.
 - DO NOT make the person sound busy. Make them sound effective. There is a difference.
+- DO NOT say "worked on" or "continued work on." Name the specific action: rebased, fixed, added tests, addressed review comments.
 
 ## Output Format
 

@@ -111,6 +111,64 @@ Before printing:
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
 
+## Calibration Examples
+
+### BAD: Quick wins (not actually quick)
+```
+QUICK WINS (clear these first)
+  Merge: Prefill pod autoscaler (RedHatAI/llm-d) - approved
+    https://github.com/RedHatAI/llm-d/pull/145
+  Review: Redesign the entire KV cache eviction strategy (RedHatAI/llm-d)
+    https://github.com/RedHatAI/llm-d/pull/119
+```
+Why it is bad: A PR with merge conflicts is not a quick win even if it is approved. A PR titled "redesign the entire KV cache eviction strategy" is obviously not a quick review. Be honest about what is actually fast.
+
+### GOOD: Quick wins (genuinely quick, verified)
+```
+QUICK WINS (clear these first)
+  Merge: Add graceful shutdown handler (RedHatAI/llm-d) - approved, no conflicts
+    https://github.com/RedHatAI/llm-d/pull/138
+  Merge: Bump vLLM to 0.4.2 (RedHatAI/vllm) - approved, no conflicts
+    https://github.com/RedHatAI/vllm/pull/88
+```
+Why it is good: Both are genuinely quick. "No conflicts" confirms they can be merged right now. Starting the week by shipping two things feels good and unblocks downstream work.
+
+### BAD: Watch out for (generic warnings)
+```
+WATCH OUT FOR
+  Some of your PRs might go stale soon
+  You have a few reviews pending that you should probably get to
+  There may be upcoming deadlines to keep an eye on
+```
+Why it is bad: "Might," "probably," "may be" are all hedge words. No specifics. This is anxiety-producing without being actionable.
+
+### GOOD: Watch out for (specific, date-anchored)
+```
+WATCH OUT FOR
+  Prefill pod autoscaler (RedHatAI/llm-d) hits 7d without review on Wednesday. Ping reviewers before then.
+  CI failing on main in RedHatAI/vllm since Friday. Your PRs will be blocked until this is fixed.
+  Milestone "v0.5" due Jul 3: 4/12 issues still open.
+```
+Why it is good: Each warning has a specific date or threshold. The reader knows exactly when something becomes a problem and what to do about it.
+
+### BAD: You might want to (generic advice)
+```
+YOU MIGHT WANT TO
+  Consider reviewing PRs to help the team
+  Think about prioritizing your open issues
+  It might be good to check on CI status
+```
+Why it is bad: This is generic productivity advice dressed up as data. None of it comes from actual findings.
+
+### GOOD: You might want to (grounded in data)
+```
+YOU MIGHT WANT TO
+  Check on your review of KV cache eviction (RedHatAI/llm-d) from 6d ago - still open, author pushed fixes
+  Rebase prefill pod autoscaler (RedHatAI/llm-d) - last updated 5d ago, conflict risk growing
+  3 assigned issues untouched for 14+ days. Keep or reassign?
+```
+Why it is good: Every suggestion comes from a specific data point. "Author pushed fixes" tells you there is something new to look at. "5d ago, conflict risk growing" quantifies the risk.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT turn this into a standup or a briefing. This is FORWARD-looking only. Do not report what happened last week.
@@ -119,6 +177,7 @@ Before printing:
 - DO NOT include items that are not the user's responsibility (unless --include-team is passed).
 - DO NOT suggest creating new issues or PRs unless there is a clear reason from the data.
 - DO NOT present a wall of tasks. If they have 15 things, group them and say which 3 matter most this week.
+- DO NOT say "might want to consider." Either recommend it or do not. "Rebase this PR" not "you might want to consider rebasing."
 
 ## Output Format
 

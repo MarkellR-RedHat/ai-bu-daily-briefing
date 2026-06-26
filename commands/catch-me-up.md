@@ -98,6 +98,61 @@ Before printing:
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
 
+## Calibration Examples
+
+### BAD: ACT ON THIS section (no urgency context)
+```
+ACT ON THIS (3 items waiting on you)
+  Review requested: Fix memory leak in scheduler (RedHatAI/llm-d)
+    https://github.com/RedHatAI/llm-d/pull/142
+  Your PR needs changes: Prefill pod autoscaler (RedHatAI/llm-d)
+    https://github.com/RedHatAI/llm-d/pull/145
+  New issue assigned: Write scaling runbook (RedHatAI/llm-d)
+    https://github.com/RedHatAI/llm-d/issues/101
+```
+Why it is bad: No age, no blocking context, no indication of who is waiting. The reader still does not know what to do first.
+
+### GOOD: ACT ON THIS section (blocking context, sorted by urgency)
+```
+ACT ON THIS (3 items waiting on you)
+  Changes requested on your PR: Prefill pod autoscaler (RedHatAI/llm-d)
+    https://github.com/RedHatAI/llm-d/pull/145
+    @reviewer left 2 comments on error handling 3d ago. Blocking merge.
+  Review requested: Fix memory leak in scheduler (RedHatAI/llm-d) - opened 4d ago
+    https://github.com/RedHatAI/llm-d/pull/142
+    @alice is blocked on this. Scheduler OOMs in production under load.
+  New assignment: Write scaling runbook (RedHatAI/llm-d) [urgent]
+    https://github.com/RedHatAI/llm-d/issues/101
+    Tagged urgent while you were out. No deadline specified.
+```
+Why it is good: Changes-requested PR is first because it blocks YOUR merge. Review is next because it blocks a teammate. Each entry says WHY it matters, not just WHAT it is.
+
+### BAD: FYI section (changelog dump)
+```
+FYI - WHAT SHIPPED
+  RedHatAI/llm-d: Fix typo in README
+  RedHatAI/llm-d: Update CI config
+  RedHatAI/llm-d: Add batch inference endpoint
+  RedHatAI/llm-d: Bump vLLM to 0.4.2
+  RedHatAI/llm-d: Fix linter warnings
+  RedHatAI/llm-d: Update CODEOWNERS
+  RedHatAI/llm-d: Add P99 latency metric
+  RedHatAI/vllm: Fix tokenizer race condition
+  RedHatAI/vllm: Update docs
+```
+Why it is bad: Nine items listed individually, no hierarchy. Typo fixes and CODEOWNERS changes have the same visual weight as a new inference endpoint. This is a git log, not a briefing.
+
+### GOOD: FYI section (consolidated, highlights only)
+```
+FYI - WHAT SHIPPED
+  RedHatAI/llm-d: 7 PRs merged
+    Highlight: Add batch inference endpoint, Add P99 latency metric, Bump vLLM to 0.4.2
+  RedHatAI/vllm: 2 PRs merged
+    Highlight: Fix tokenizer race condition
+  3 dependency updates merged across 2 repos
+```
+Why it is good: Consolidated by repo, only notable PRs called out individually. The reader gets the picture in 4 lines instead of 9.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT dump every notification. Only review requests and mentions matter.
@@ -106,6 +161,7 @@ Before printing:
 - DO NOT say "while you were away, the team was busy." Just show what happened.
 - DO NOT add "welcome back" or similar pleasantries. They do not need warmth from a command. They need information.
 - DO NOT include items from before the absence window started.
+- DO NOT say "several important changes were made." Name the changes or summarize with a count.
 
 ## Output Format
 

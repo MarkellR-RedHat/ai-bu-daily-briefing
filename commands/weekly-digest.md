@@ -76,6 +76,64 @@ Before printing:
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
 
+## Calibration Examples
+
+### BAD: Summary line (inflated, vague)
+```
+Summary: Had a productive week with various contributions across multiple repositories and several code reviews completed.
+```
+Why it is bad: "Various contributions" and "several code reviews" tell the reader nothing. A manager reading this learns zero about what happened. This is the kind of status update that makes people stop reading status updates.
+
+### GOOD: Summary line (precise, honest)
+```
+Summary: 4 shipped, 6 reviewed, 3 issues closed, 2 carrying over
+```
+Why it is good: Every number is verifiable. A manager reads this in 3 seconds and knows the story. A teammate can scan it for signals about review load.
+
+### BAD: Shipped section (no differentiation)
+```
+SHIPPED (6 PRs merged)
+  RedHatAI/llm-d: Update README
+  RedHatAI/llm-d: Fix typo in comments
+  RedHatAI/llm-d: Add batch inference endpoint
+  RedHatAI/llm-d: Fix OOM in long-context inference
+  RedHatAI/llm-d: Add P99 latency metric
+  RedHatAI/llm-d: Fix linter warnings
+```
+Why it is bad: Typo fixes and linter changes have the same weight as a new batch inference endpoint. This makes a strong week look like busywork.
+
+### GOOD: Shipped section (leads with real deliverables)
+```
+SHIPPED (6 PRs merged)
+  RedHatAI/llm-d:
+    Add batch inference endpoint (merged Mon)
+      https://github.com/RedHatAI/llm-d/pull/140
+    Fix OOM in long-context inference (merged Wed)
+      https://github.com/RedHatAI/llm-d/pull/142
+    Add P99 latency metric (merged Thu)
+      https://github.com/RedHatAI/llm-d/pull/148
+    Plus 3 minor fixes (README, comments, linter)
+```
+Why it is good: The real work leads. Minor fixes are consolidated into one line so they do not dilute the signal.
+
+### BAD: Open PRs section (missing state)
+```
+OPEN PRs (2)
+  RedHatAI/llm-d: Prefill pod autoscaler
+  RedHatAI/vllm: Async tokenizer pipeline
+```
+Why it is bad: Are these stuck? In progress? Approved and ready to merge? The reader has no idea.
+
+### GOOD: Open PRs section (every PR has a state)
+```
+OPEN PRs (2)
+  RedHatAI/llm-d: Prefill pod autoscaler - WAITING 5d, no reviewer assigned
+    https://github.com/RedHatAI/llm-d/pull/145
+  RedHatAI/vllm: Async tokenizer pipeline - IN PROGRESS, opened yesterday
+    https://github.com/RedHatAI/vllm/pull/92
+```
+Why it is good: Each PR has a state and enough context to understand the carryover situation.
+
 ## Anti-Patterns (DO NOT do these)
 
 - DO NOT report Dependabot/Renovate PRs as "shipped work" unless the user explicitly authored them. Consolidate automated PRs into one line: "[N] dependency updates merged."
@@ -84,6 +142,7 @@ Before printing:
 - DO NOT add reflection paragraphs ("This was a productive week..."). The numbers speak for themselves.
 - DO NOT include a "goals for next week" section. That belongs in /week-ahead.
 - DO NOT make the week sound busier than it was. Honesty builds trust.
+- DO NOT say "contributed to" or "participated in." Name the specific action: merged, reviewed, opened, closed.
 
 ## Output Format
 
