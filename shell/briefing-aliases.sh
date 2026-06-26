@@ -42,6 +42,36 @@ pulse() {
   claude "/team-pulse $*"
 }
 
+# Catch-me-up briefing via Claude Code
+# Usage: catchmeup <days> [--org OrgName]
+catchmeup() {
+  if ! command -v claude &> /dev/null; then
+    echo "Error: claude CLI not found. Install Claude Code first."
+    return 1
+  fi
+  claude "/catch-me-up $*"
+}
+
+# Risk radar scan via Claude Code
+# Usage: riskradar [--org OrgName] [--repo repo-name] [--days 14]
+riskradar() {
+  if ! command -v claude &> /dev/null; then
+    echo "Error: claude CLI not found. Install Claude Code first."
+    return 1
+  fi
+  claude "/risk-radar $*"
+}
+
+# Week ahead planning via Claude Code
+# Usage: weekahead [--org OrgName] [--repo repo-name]
+weekahead() {
+  if ! command -v claude &> /dev/null; then
+    echo "Error: claude CLI not found. Install Claude Code first."
+    return 1
+  fi
+  claude "/week-ahead $*"
+}
+
 # Quick list of PRs needing your review
 # Usage: prs [org-name]
 prs() {

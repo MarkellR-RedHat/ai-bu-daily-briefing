@@ -64,7 +64,7 @@ echo ""
 echo -e "${BOLD}Installing Claude Code commands...${NC}"
 mkdir -p "$CLAUDE_CMD_DIR"
 
-COMMANDS=(briefing standup weekly-digest team-pulse)
+COMMANDS=(briefing standup weekly-digest team-pulse catch-me-up risk-radar week-ahead)
 
 for cmd in "${COMMANDS[@]}"; do
   if [ -f "$CLAUDE_CMD_DIR/$cmd.md" ]; then
@@ -84,14 +84,17 @@ echo ""
 
 # Step 2: Shell aliases
 echo -e "${BOLD}Shell aliases available:${NC}"
-echo "  morning    - full daily briefing via Claude Code"
-echo "  standup    - quick standup prep via Claude Code"
-echo "  weekly     - week-in-review digest via Claude Code"
-echo "  pulse      - team activity check via Claude Code"
-echo "  prs        - list PRs needing your review"
-echo "  greview    - interactive PR review picker (fzf)"
-echo "  prs-stale  - list PRs open longer than 7 days"
-echo "  myissues   - list your assigned issues"
+echo "  morning     - full daily briefing via Claude Code"
+echo "  standup     - quick standup prep via Claude Code"
+echo "  weekly      - week-in-review digest via Claude Code"
+echo "  pulse       - team activity check via Claude Code"
+echo "  catchmeup   - return-from-absence briefing via Claude Code"
+echo "  riskradar   - risk and warning scan via Claude Code"
+echo "  weekahead   - plan your upcoming week via Claude Code"
+echo "  prs         - list PRs needing your review"
+echo "  greview     - interactive PR review picker (fzf)"
+echo "  prs-stale   - list PRs open longer than 7 days"
+echo "  myissues    - list your assigned issues"
 echo ""
 
 install_aliases() {
@@ -135,8 +138,13 @@ fi
 echo ""
 echo -e "${GREEN}${BOLD}Done.${NC} To get started:"
 echo ""
-echo "  Claude Code commands:  /briefing  /standup  /weekly-digest  /team-pulse"
-echo "  Shell aliases:         morning  standup  weekly  pulse  prs  greview  prs-stale  myissues"
+echo "  Claude Code commands:"
+echo "    /briefing        /standup         /weekly-digest"
+echo "    /team-pulse      /catch-me-up     /risk-radar      /week-ahead"
+echo ""
+echo "  Shell aliases:"
+echo "    morning  standup  weekly  pulse  catchmeup  riskradar  weekahead"
+echo "    prs  greview  prs-stale  myissues"
 echo ""
 echo "  If you installed shell aliases, restart your shell or run:"
 echo "    source $ALIASES_FILE"

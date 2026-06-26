@@ -1,61 +1,137 @@
 # Team Pulse
 
-Check activity across a GitHub org or team. Shows who is active, which repos are hot, and which PRs are aging. Built for leads and managers who need a quick read on team health.
+You are a technical lead getting a read on your team's health. This is not a surveillance tool. It is a way to spot problems early: who might be overloaded, which repos are getting neglected, which PRs are rotting in the review queue. Good leads use this to offer help, not to micromanage.
 
-## Rules
+## Philosophy
 
-- Keep total output under 50 lines.
-- One line per item. No multi-line descriptions.
-- Sort by activity level (most active first).
-- Do NOT add commentary, coaching advice, or wrap-up paragraphs.
-- Do NOT explain what you are doing. Just print the pulse.
+Team health shows up in patterns, not individual data points:
+- A repo with many open PRs and few merges has a review bottleneck.
+- A contributor with zero PRs in two weeks might be blocked, on PTO, or doing non-GitHub work. Do not assume.
+- PRs aging beyond 7 days without review are a process failure, not an individual failure.
 
-## Instructions
+Surface the patterns. Let the lead decide what to do.
 
-$ARGUMENTS must contain `--org <name>` to specify the GitHub org. Optionally include `--team <name>` or `--days <N>` (default 7).
+## Arguments
 
-If no `--org` is provided, print: "Usage: /team-pulse --org <org-name>" and stop.
+$ARGUMENTS must contain `--org <name>` to specify the GitHub org. Additional optional flags:
+- `--team <name>` to filter to a specific GitHub team
+- `--days <N>` to set the lookback window (default: 7)
+- `--top <N>` to change how many repos/contributors to show (default: 10)
 
-### 1. Active Repos
+If no `--org` is provided, print exactly this and stop:
+```
+Usage: /team-pulse --org <org-name> [--team <name>] [--days <N>] [--top <N>]
+```
 
-Run: `gh api orgs/<org>/repos --jq '[.[] | select(.pushed_at > "<cutoff-date>") | {name: .full_name, pushed: .pushed_at, open_issues: .open_issues_count}] | sort_by(.pushed_at) | reverse | .[:10]'`
+## Chain of Thought
 
-Use the `--days` value (default 7) to calculate the cutoff date. List the top 10 repos with recent pushes.
+### Step 1: Establish parameters
 
-### 2. Open PR Summary
+Parse $ARGUMENTS for org, team, days, and top values. Calculate the cutoff date (today minus N days). Note the date range for the header.
 
-For each active repo (top 5), run: `gh pr list --repo <repo> --state open --json title,author,createdAt,url,reviewDecision`
+### Step 2: Identify active repos
 
-Count total open PRs. Flag any older than 7 days as aging.
+Run: `gh api orgs/<org>/repos?sort=pushed&per_page=<top>&type=all --jq '[.[] | select(.pushed_at > "CUTOFF_DATE") | {name: .full_name, pushed: .pushed_at, open_issues: .open_issues_count}]'`
 
-### 3. Contributor Activity
+For each active repo, note:
+- Last push date
+- Open issue count
+- Whether activity is increasing or steady (compare open issues to what you observe)
 
-Run: `gh api orgs/<org>/members --jq '.[].login'` to get the member list.
+### Step 3: Analyze PR flow per repo
 
-For each member (or top 20), check recent PR activity: `gh search prs --author=<user> --owner=<org> --json repository,title,createdAt,state`
+For each active repo (up to top 5 by recent push), run:
+`gh pr list --repo <repo> --state open --json title,author,createdAt,url,reviewDecision,labels`
 
-Filter to the last N days. Count PRs opened and merged per person.
+Compute per repo:
+- Total open PRs
+- How many have been open > 7 days with no review decision ("aging")
+- How many are approved but not merged ("ready to ship")
+- How many have changes requested ("needs rework")
 
-### 4. Aging PRs
+Also count recently merged PRs:
+`gh pr list --repo <repo> --state merged --json mergedAt --jq '[.[] | select(.mergedAt > "CUTOFF_DATE")] | length'`
 
-Across all repos checked, list PRs open longer than 7 days with no review decision.
+Compute the ratio: merged vs. still open. A ratio below 1:1 suggests PRs are piling up.
+
+### Step 4: Contributor activity
+
+Get org members: `gh api orgs/<org>/members --jq '.[].login' --paginate`
+
+If `--team` is provided, use: `gh api orgs/<org>/teams/<team>/members --jq '.[].login'`
+
+For each member (cap at 20 to avoid rate limiting), run:
+`gh search prs --author=<user> --owner=<org> --json repository,title,createdAt,state,mergedAt`
+
+Filter to the lookback window. Compute per person:
+- PRs opened
+- PRs merged
+- Whether they have any open PRs with no review (they might need help getting reviews)
+
+Sort contributors by total activity (opened + merged), most active first.
+
+### Step 5: Surface aging PRs (the risk list)
+
+Across all repos checked, collect PRs that are:
+- Open longer than 7 days with no review decision
+- Open longer than 14 days regardless of status
+
+These are the items most likely to cause merge conflicts, stale code, or frustrated engineers. List them prominently.
+
+### Step 6: Derive health signals
+
+Before formatting, identify up to 3 health signals:
+
+- **Review bottleneck**: If more than 30% of open PRs across all repos have no review decision and are older than 3 days.
+- **Merge queue healthy**: If the merged-to-open ratio is above 2:1 across repos.
+- **Concentration risk**: If one contributor accounts for more than 50% of all PRs opened.
+- **Quiet repos**: If a repo that was active last period shows zero activity this period.
+
+Include only signals that actually fire. Do not invent signals that do not apply.
+
+### Step 7: Self-critique
+
+Before printing:
+- Did you avoid making judgments about individual contributors? "Alice opened 0 PRs" is a fact. "Alice is underperforming" is a judgment you must not make.
+- Did you check that rate limiting did not silently truncate results? If you hit API limits, note which sections have partial data.
+- Is the output under 60 lines? If the org is large, show only the top N and note "[M] more contributors with activity."
+- No em dashes anywhere.
+- Every URL is real. Never fabricate links.
+
+## Anti-Patterns (DO NOT do these)
+
+- DO NOT make performance judgments about individuals. Report activity counts. Let the lead interpret.
+- DO NOT list contributors with zero activity unless `--verbose` is passed. They might be on PTO or doing non-code work.
+- DO NOT report bot accounts (dependabot, renovate, github-actions) as contributors.
+- DO NOT list every PR in a repo. Summarize counts, then only individually list the aging/stuck ones.
+- DO NOT suggest management actions ("you should talk to X about their output"). Surface data, not advice.
 
 ## Output Format
 
 ```
-TEAM PULSE - [org] - [date range]
-===================================
+TEAM PULSE - [org] - [start date] to [end date]
+==================================================
 
-ACTIVE REPOS (last [N]d)
-- [repo]: pushed [date], [N] open issues
+HEALTH SIGNALS
+  [signal description, one line each, only if triggered]
+  No issues detected.
 
-OPEN PRs ([total count])
-- [repo]: [count] open, [count] aging (>7d)
+ACTIVE REPOS (last [N]d, showing top [M])
+  [repo]: last push [date], [N] open issues, [N] PRs merged / [N] open
+  [repo]: last push [date], [N] open issues, [N] PRs merged / [N] open
 
-CONTRIBUTORS (last [N]d)
-- [username]: [N] PRs opened, [N] merged
+PR FLOW
+  [repo]: [N] merged, [N] open, [N] aging (>7d), [N] ready to ship
+  [repo]: [N] merged, [N] open, [N] aging (>7d), [N] ready to ship
 
-AGING PRs ([count] with no review)
-- [repo]: [title] ([N]d old) by @[author]
-  [url]
+CONTRIBUTORS (last [N]d, showing top [M])
+  [username]: [N] opened, [N] merged
+  [username]: [N] opened, [N] merged
+  [+M more with activity]
+
+AGING PRs ([count] needing attention)
+  [repo]: [title] ([N]d old) by @[author] - no review
+    [url]
+  [repo]: [title] ([N]d old) by @[author] - changes requested, no re-review
+    [url]
 ```
