@@ -144,6 +144,25 @@ Why it is good: Each PR has a state and enough context to understand the carryov
 - DO NOT make the week sound busier than it was. Honesty builds trust.
 - DO NOT say "contributed to" or "participated in." Name the specific action: merged, reviewed, opened, closed.
 
+## Edge Cases
+
+- **Zero PRs shipped**: Do not apologize or add filler. Print: "Summary: 0 shipped, [N] reviewed, [N] issues closed, [N] carrying over" and let the numbers stand. Review work and issue triage are real contributions. A week with zero merges but 8 reviews was a week spent unblocking others.
+- **All shipped PRs are dependency bumps or bot-authored**: Consolidate into one line: "[N] automated dependency updates merged." Do not list them individually. If ONLY bot PRs merged, note: "No user-authored PRs shipped this period. [N] dependency updates merged." Be factual, not judgmental.
+- **Multi-week lookback (--weeks 2+)**: Group shipped work by week: "Week of [date]: [N] shipped" with details under each. Do not flatten two weeks into one list or the reader loses the narrative arc.
+- **Repo access errors**: If `gh` returns permission errors for some repos, note: "Partial data. [N] repos returned access errors and are excluded." Do not silently skip repos.
+- **100+ review contributions**: Consolidate reviews by repo: "[repo]: reviewed [N] PRs." Do not list each review individually. Nobody needs to read 100 lines of review titles.
+- **Stale issues older than 30 days**: Flag them separately at the bottom of the issues section: "[N] issues assigned to you are older than 30 days. Consider closing or reassigning." Do not repeat this warning per issue.
+
+## Cross-Tool Flow
+
+After printing the digest, add exactly one line:
+
+- If there are carrying-over items, print: `Tip: /week-ahead to plan around what is still open.`
+- If they shipped a lot and have few carryovers, print: `Tip: /standup to prep for Monday's standup with this week fresh in mind.`
+- If there are stale issues or stuck PRs, print: `Tip: /risk-radar to check if your stuck items are part of a broader pattern.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```

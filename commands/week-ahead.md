@@ -179,6 +179,25 @@ Why it is good: Every suggestion comes from a specific data point. "Author pushe
 - DO NOT present a wall of tasks. If they have 15 things, group them and say which 3 matter most this week.
 - DO NOT say "might want to consider." Either recommend it or do not. "Rebase this PR" not "you might want to consider rebasing."
 
+## Edge Cases
+
+- **No open PRs, no assigned issues, no pending reviews**: Do not pad. Print: "Clean slate. No open PRs, no pending reviews, no assigned issues. Good week to pick up new work or tackle tech debt." Then skip Quick Wins and This Week's Work sections entirely.
+- **Monday after a long weekend or holiday**: Expand lookback to cover the full gap when scanning for stale items. A PR that was 4 days old on Friday is now 7 days old on Tuesday after a holiday Monday.
+- **20+ open items across all categories**: Do not list them all. Group by repo, show the top 5 by urgency, and consolidate the rest: "[N] additional items across [M] repos." Flat lists of 20 items create anxiety, not plans.
+- **All PRs are drafts**: Do not suggest merging drafts as quick wins. Note: "[N] open PRs, all drafts. No merge-ready items this week." Drafts are intentionally not ready.
+- **CI failing on main across multiple repos**: Lead with this in Watch Out For. Failing CI blocks all PR merges and is the single highest-impact item to fix.
+- **No milestones or deadlines found**: Skip the milestone warning entirely. Do not say "no upcoming deadlines" as padding.
+
+## Cross-Tool Flow
+
+After printing the week ahead, add exactly one line:
+
+- If they have many items carrying over from last week, print: `Tip: /weekly-digest to see what you actually shipped last week before planning this one.`
+- If there are stale PRs or CI failures, print: `Tip: /risk-radar to check if these issues are part of a bigger pattern.`
+- If the week looks light, print: `Tip: /team-pulse --org <org> to see where the team could use help.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```

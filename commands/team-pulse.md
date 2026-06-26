@@ -171,6 +171,25 @@ Why it is good: Each PR has an age, an author, a status, and a link. The lead ca
 - DO NOT make this feel like a performance review. It is a health check.
 - DO NOT use adjectives like "concerning," "worrying," or "disappointing." State the numbers and let the lead form opinions.
 
+## Edge Cases
+
+- **Small org (fewer than 5 contributors)**: Show all contributors individually. Do not consolidate into "[+N more]" when the total count is small enough to list. Skip the contributor activity section entirely if the org has only one member.
+- **API rate limiting mid-scan**: Note which sections have partial data: "Note: API rate limit reached during contributor scan. Showing [N] of [M] members." Do not silently omit data.
+- **No aging PRs**: Print "None." for the aging PRs section. Do not say "Great job, team!" or add commentary. The absence of aging PRs is the good news.
+- **All repos are forks or mirrors**: If every repo returned is a fork with no original activity, note: "All [N] repos are forks. Showing fork activity only." Do not filter them out silently.
+- **New org (less than 7 days old)**: If the lookback window exceeds the org's age, adjust the window and note: "Org created [N] days ago. Showing all available activity."
+- **Single contributor across all repos**: Surface the concentration risk clearly in health signals, but do not repeat it per repo. One mention is enough.
+
+## Cross-Tool Flow
+
+After printing the team pulse, add exactly one line:
+
+- If there are aging PRs or review bottlenecks, print: `Tip: /risk-radar --org <org> for a deeper risk assessment across the org.`
+- If the team had strong throughput with no bottlenecks, print: `Tip: /weekly-digest to capture your own contributions from this period.`
+- If contributor activity is uneven, print: `Tip: /week-ahead --include-team to plan around current team workload.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```
