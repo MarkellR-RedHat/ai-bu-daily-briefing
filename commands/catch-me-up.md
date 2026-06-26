@@ -163,6 +163,44 @@ Why it is good: Consolidated by repo, only notable PRs called out individually. 
 - DO NOT include items from before the absence window started.
 - DO NOT say "several important changes were made." Name the changes or summarize with a count.
 
+## Depth Modes
+
+Scale the output to match the absence length:
+
+- **1-2 days (quick catch-up)**: Keep it tight, under 40 lines. Section 1 is everything. Section 2 only if something genuinely surprising happened. Section 3 is a one-line summary per repo at most.
+- **3-5 days (standard PTO)**: Full treatment, up to 60 lines. All three sections with detail. This is the core use case.
+- **5-10 days (extended absence)**: Up to 80 lines. Consolidate aggressively in Section 3 (FYI). Nobody returning from a week of PTO wants to read about every merged PR. Focus Section 1 and Section 2 heavily; those are what prevent them from looking lost in their first meeting back.
+- **10+ days**: Same as 5-10 but add a one-line note at the top: "Long absence. Showing only items that need your direct action or that significantly changed direction. Run /briefing daily this week to rebuild context gradually."
+
+## Edge Cases
+
+- **Quiet absence (nothing happened)**: Do not pad. Print:
+  ```
+  ACT ON THIS (0 items)
+    Nothing is waiting on you. Clean slate.
+
+  BE AWARE
+    Nothing notable changed direction during your absence.
+
+  FYI - WHAT SHIPPED
+    Quiet period across your repos. [N] total PRs merged, all routine.
+  ```
+  That is a perfectly good briefing. The person feels caught up in 10 seconds.
+- **20+ repos with activity during absence**: Do not enumerate every repo. Show repos where the user has action items (Section 1) individually. For Sections 2 and 3, show the top 5 repos by activity volume and consolidate the rest: "[N] other repos had routine activity." If `--org` or `--repo` is provided, follow that filter.
+- **Weekend in the middle of absence window**: Treat weekends as normal days in the window. Do not skip them. Weekend deploys and weekend review requests are real and need to be surfaced.
+- **No review requests or action items**: Lead with that. "Nothing is waiting on you" is the most useful thing you can say to someone returning anxious about their inbox.
+- **Massive activity (50+ PRs merged)**: Consolidate hard. Per-repo summaries with one highlight each. Do not let Section 3 turn into a changelog. The person can always run /team-pulse for the full picture.
+
+## Cross-Tool Flow
+
+After printing the catch-up, add exactly one line:
+
+- If there are action items waiting, print: `Tip: /standup to turn today's action items into standup notes.`
+- If the absence was 5+ days, print: `Tip: /risk-radar to check for anything that drifted while you were out.`
+- If it was a quiet absence with nothing urgent, print: `Tip: /week-ahead to plan your return week.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```

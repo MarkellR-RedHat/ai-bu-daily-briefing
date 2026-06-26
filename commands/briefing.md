@@ -186,9 +186,33 @@ TEAM ACTIVITY (last 24h)
   [repo]: [count] PRs merged
 ```
 
+## Depth Modes
+
+Match your output depth to the situation:
+
+- **Default (quick standup prep)**: One screen, 40 lines max. Hit the top items in each category, skip anything that is routine. This is the 90-second briefing for someone about to walk into a meeting.
+- **With `--verbose` (full analysis)**: Up to 60 lines. Add one context line per item. Show review request age breakdowns, PR comment summaries, and issue label details. This is for the person who has 20 minutes and wants to genuinely understand the landscape before making decisions.
+
+Do not change the structure between modes. Same sections, same priority order. The verbose flag adds depth per item, not more items.
+
 ## Edge Cases
 
 - If `gh` auth fails, print: "GitHub CLI not authenticated. Run: gh auth login" and stop.
 - If all sections are empty, print: "Nothing to report. Your GitHub activity is clear. Either you are on vacation, or this is the calm before a very productive day."
 - If a command times out, note which section had incomplete data rather than silently omitting it.
 - If the user passes unrecognized arguments, print usage: "Usage: /briefing [--org name] [--repo name] [--verbose]"
+- **Quiet day (no activity in last 24 hours)**: Do not fabricate activity or pad sections. Print: "Quiet day. No new notifications, no PRs waiting on you, no issues updated. Use the time for deep work or clear out old items." That honesty is the whole point of this tool.
+- **Monday morning**: Automatically expand the lookback to 72 hours (covering Saturday and Sunday). If nothing happened over the weekend, say so: "Weekend was quiet across your repos." If there WAS weekend activity, surface it with a note: "Weekend activity detected" so they know to check for context they may have missed.
+- **20+ repos**: Do not list activity for every repo. Prioritize: show repos where the user has open PRs, review requests, or assigned issues. For team activity, show only the top 5 repos by merge count. Consolidate the rest into: "[N] other repos had activity." If `--org` or `--repo` is provided, respect that filter and ignore this heuristic.
+- **No open PRs**: Print "None." for that section. Do not say "You have no open PRs, consider opening one!" That is not a briefing, that is a to-do list.
+- **No blockers or urgent items**: Lead with that. "No fires today." is valuable information. Do not manufacture urgency.
+
+## Cross-Tool Flow
+
+After printing the briefing, add exactly one line at the bottom:
+
+- If the user has standup-relevant data (review requests, open PRs, merged work), print: `Tip: /standup to turn this into standup notes.`
+- If the user has items carrying over or aging PRs, print: `Tip: /week-ahead to plan around what is piling up.`
+- If nothing is urgent and it is a quiet day, print: `Tip: /risk-radar to check for anything simmering under the surface.`
+
+Only print ONE of these. Pick the most relevant. Keep it on a single line. No decoration.

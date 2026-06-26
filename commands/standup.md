@@ -150,6 +150,37 @@ Why it is good: Names the exact PR, the exact duration, and the exact problem. A
 - DO NOT make the person sound busy. Make them sound effective. There is a difference.
 - DO NOT say "worked on" or "continued work on." Name the specific action: rebased, fixed, added tests, addressed review comments.
 
+## Depth Modes
+
+Match output to the situation:
+
+- **Default (quick standup prep)**: Under 25 lines. Three sections, top items only. This is the note card before the meeting.
+- **With `--days <N>` or multi-day lookback**: Expand the "yesterday" section proportionally. For a 3-day weekend lookback, allow up to 6 bullets in "yesterday" but consolidate where possible: "Reviewed 3 PRs in llm-d" instead of listing each one individually. Do not let a longer window bloat the output past 30 lines.
+- **Full team activity analysis**: If the user passes `--org`, include one additional line per section noting team-wide context where it adds value (e.g., "Team merged 12 PRs across 4 repos this period"). Keep it to one line, not a full team report. That is what /team-pulse is for.
+
+## Edge Cases
+
+- **Quiet day (no GitHub activity in the lookback window)**: Do not pad. Print:
+  ```
+  YESTERDAY:
+    No GitHub activity in the last [N] hours. Deep work day, meetings, or PTO.
+  ```
+  Then fill "today" and "blockers" normally. A quiet yesterday does not mean a quiet today.
+- **Monday morning**: Automatically use a 3-day lookback (Friday through Sunday) unless `--days` overrides it. If the weekend was quiet, consolidate: "Weekend: no GitHub activity." If there was weekend work, list it normally but note the day: "Merged (Sat): [title]" so the team knows it was weekend work.
+- **20+ repos with activity**: Consolidate by repo. "Reviewed 4 PRs across 3 repos" is better than listing each one. Only individually name PRs where you were the author or where the action matters for today's plan. If `--org` or `--repo` narrows the scope, follow that filter instead.
+- **No open PRs for "today" section**: Print what is actually next. If they have assigned issues, show those. If they have reviews pending, show those. If genuinely nothing is queued: "No open items. Pick up new work or check /briefing for incoming requests."
+- **No blockers**: Print "No blockers." and mean it. One line. Do not explain why there are no blockers.
+
+## Cross-Tool Flow
+
+After printing the standup, add exactly one line:
+
+- If they have many open PRs or review requests piling up, print: `Tip: /week-ahead to sequence what matters most this week.`
+- If it is Friday, print: `Tip: /weekly-digest to summarize your week for status updates.`
+- If there are genuine blockers listed, print: `Tip: /risk-radar to see if this is part of a bigger pattern.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```

@@ -180,6 +180,38 @@ Why it is good: Data comes directly from the Dependabot API. Links to the actual
 - DO NOT be alarmist. A calm, factual tone builds more trust than exclamation points.
 - DO NOT say "immediate action required." State the finding and its severity. The lead decides what is immediate.
 
+## Depth Modes
+
+Scale output to match what the reader needs:
+
+- **Default (quick scan)**: Show all HIGH and MEDIUM findings individually. Consolidate LOW findings into counts: "[N] LOW items across [N] repos." Under 40 lines. This is for the lead who checks in once a day and wants to know if anything needs action.
+- **With `--severity high`**: Only HIGH findings. Under 20 lines. For the busy week when you only want to know about fires.
+- **With `--severity low` (show everything)**: Full detail on every finding, including LOW. Up to 60 lines. This is the thorough walkthrough for a weekly risk review meeting or a team retrospective.
+
+## Edge Cases
+
+- **No risks found (clean scan)**: Do not invent findings. Print:
+  ```
+  Summary: 0 HIGH, 0 MEDIUM, 0 LOW
+  Clean scan. No process, quality, security, or team risks detected across [N] repos.
+  ```
+  A clean bill of health is real output, not a failure state.
+- **20+ repos in scope**: Scan all of them but consolidate LOW findings aggressively. Group by risk category rather than listing per-repo. Only individually name repos in HIGH and MEDIUM findings. Add a footer: "Scanned [N] repos. LOW findings consolidated by category."
+- **Dependabot API returns 404 for most repos**: Note it once: "Dependabot alerts not enabled for [N] of [M] repos scanned." Do not list each repo individually. That is noise, not signal.
+- **All risks are LOW**: Lead with that. "No HIGH or MEDIUM risks. [N] LOW items noted for awareness." Then list the LOW items. A lead reading this feels informed, not anxious.
+- **Single repo scan (--repo)**: Go deeper on that repo since scope is narrow. Show individual LOW findings instead of consolidating. Check more workflow runs (up to 50 instead of 20). This is the focused audit mode.
+- **Rate limiting**: If gh API calls are throttled, note which sections have incomplete data: "Note: API rate limit reached. [SECURITY] section may have incomplete data." Do not silently omit sections.
+
+## Cross-Tool Flow
+
+After printing the risk radar, add exactly one line:
+
+- If there are HIGH process risks (stale PRs, review bottlenecks), print: `Tip: /team-pulse for a full view of review health and contributor load.`
+- If there are security findings, print: `Tip: Run 'gh api repos/<repo>/dependabot/alerts' for full vulnerability details.`
+- If the scan is clean, print: `Tip: /week-ahead to plan your week while the skies are clear.`
+
+Only print ONE. Pick the most relevant. Single line, no decoration.
+
 ## Output Format
 
 ```
