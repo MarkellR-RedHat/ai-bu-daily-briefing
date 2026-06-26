@@ -10,92 +10,83 @@ ALIASES_FILE="$SCRIPT_DIR/shell/briefing-aliases.sh"
 SOURCE_LINE="source \"$SCRIPT_DIR/shell/briefing-aliases.sh\""
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
+RED='\033[0;31m'
+DIM='\033[2m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-print_header() {
-  echo ""
-  echo -e "${BOLD}${BLUE}ai-bu-daily-briefing installer${NC}"
-  echo -e "${BLUE}==============================${NC}"
-  echo ""
-}
+echo ""
+echo -e "${BOLD}ai-bu-daily-briefing${NC}"
+echo ""
 
-print_ok() {
-  echo -e "  ${GREEN}[ok]${NC} $1"
-}
+# ── Prerequisites ──────────────────────────────────────
 
-print_skip() {
-  echo -e "  ${YELLOW}[skip]${NC} $1"
-}
-
-print_err() {
-  echo -e "  ${RED}[error]${NC} $1"
-}
-
-print_header
-
-# Check prerequisites
-echo -e "${BOLD}Checking prerequisites...${NC}"
+missing=0
 
 if command -v claude &> /dev/null; then
-  print_ok "claude CLI found"
+  echo -e "  ${GREEN}✓${NC} claude"
 else
-  print_err "claude CLI not found - install Claude Code first"
+  echo -e "  ${RED}✗${NC} claude ${DIM}(install Claude Code first)${NC}"
+  missing=1
 fi
 
 if command -v gh &> /dev/null; then
-  print_ok "gh CLI found"
+  echo -e "  ${GREEN}✓${NC} gh"
 else
-  print_err "gh CLI not found - install GitHub CLI first"
+  echo -e "  ${RED}✗${NC} gh ${DIM}(install GitHub CLI first)${NC}"
+  missing=1
 fi
 
 if command -v fzf &> /dev/null; then
-  print_ok "fzf found (enables interactive PR picker)"
+  echo -e "  ${GREEN}✓${NC} fzf"
 else
-  print_skip "fzf not found - greview command will not work (install: brew install fzf)"
+  echo -e "  ${YELLOW}~${NC} fzf ${DIM}(optional, brew install fzf)${NC}"
 fi
+
 echo ""
 
-# Step 1: Install Claude Code commands
-echo -e "${BOLD}Installing Claude Code commands...${NC}"
+if [ "$missing" -eq 1 ]; then
+  echo -e "  ${RED}Missing required tools. Install them and re-run.${NC}"
+  echo ""
+  exit 1
+fi
+
+# ── Install commands ───────────────────────────────────
+
 mkdir -p "$CLAUDE_CMD_DIR"
 
 COMMANDS=(briefing standup weekly-digest team-pulse catch-me-up risk-radar week-ahead)
+installed=0
+updated=0
+skipped=0
 
 for cmd in "${COMMANDS[@]}"; do
   if [ -f "$CLAUDE_CMD_DIR/$cmd.md" ]; then
-    # Check if it is the same file
     if cmp -s "$SCRIPT_DIR/commands/$cmd.md" "$CLAUDE_CMD_DIR/$cmd.md"; then
-      print_skip "/$cmd already installed (identical)"
+      skipped=$((skipped + 1))
     else
       cp "$SCRIPT_DIR/commands/$cmd.md" "$CLAUDE_CMD_DIR/$cmd.md"
-      print_ok "/$cmd updated"
+      updated=$((updated + 1))
     fi
   else
     cp "$SCRIPT_DIR/commands/$cmd.md" "$CLAUDE_CMD_DIR/$cmd.md"
-    print_ok "/$cmd installed"
+    installed=$((installed + 1))
   fi
 done
+
+total=$((installed + updated))
+if [ "$total" -gt 0 ]; then
+  echo -e "  ${GREEN}✓${NC} ${total} commands installed"
+fi
+if [ "$skipped" -gt 0 ]; then
+  echo -e "  ${DIM}  ${skipped} already up to date${NC}"
+fi
+
 echo ""
 
-# Step 2: Shell aliases
-echo -e "${BOLD}Shell aliases available:${NC}"
-echo "  morning     - full daily briefing via Claude Code"
-echo "  standup     - quick standup prep via Claude Code"
-echo "  weekly      - week-in-review digest via Claude Code"
-echo "  pulse       - team activity check via Claude Code"
-echo "  catchmeup   - return-from-absence briefing via Claude Code"
-echo "  riskradar   - risk and warning scan via Claude Code"
-echo "  weekahead   - plan your upcoming week via Claude Code"
-echo "  prs         - list PRs needing your review"
-echo "  greview     - interactive PR review picker (fzf)"
-echo "  prs-stale   - list PRs open longer than 7 days"
-echo "  myissues    - list your assigned issues"
-echo ""
+# ── Shell aliases ──────────────────────────────────────
 
 install_aliases() {
   local rc_file="$1"
@@ -103,48 +94,39 @@ install_aliases() {
   rc_name=$(basename "$rc_file")
 
   if grep -qF "briefing-aliases.sh" "$rc_file" 2>/dev/null; then
-    print_skip "Aliases already configured in $rc_name"
+    echo -e "  ${DIM}Aliases already in ${rc_name}${NC}"
     return 0
   fi
 
   echo "" >> "$rc_file"
   echo "# ai-bu-daily-briefing aliases" >> "$rc_file"
   echo "$SOURCE_LINE" >> "$rc_file"
-  print_ok "Added aliases to $rc_name"
+  echo -e "  ${GREEN}✓${NC} Added aliases to ${rc_name}"
 }
 
-read -p "Install shell aliases? (y/n) " -n 1 -r
+read -p "  Add shell aliases? (y/n) " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  local_installed=false
+  alias_installed=false
 
   if [ -f "$HOME/.zshrc" ]; then
     install_aliases "$HOME/.zshrc"
-    local_installed=true
+    alias_installed=true
   fi
 
   if [ -f "$HOME/.bashrc" ]; then
     install_aliases "$HOME/.bashrc"
-    local_installed=true
+    alias_installed=true
   fi
 
-  if [ "$local_installed" = false ]; then
-    print_err "No .zshrc or .bashrc found. Source aliases manually:"
-    echo "         source $ALIASES_FILE"
+  if [ "$alias_installed" = false ]; then
+    echo -e "  ${YELLOW}No .zshrc or .bashrc found.${NC}"
+    echo -e "  ${DIM}Add this to your shell config:${NC}"
+    echo "    source $ALIASES_FILE"
   fi
 fi
 
 echo ""
-echo -e "${GREEN}${BOLD}Done.${NC} To get started:"
+echo -e "  ${BOLD}Ready.${NC} Try ${GREEN}/briefing${NC} in Claude Code."
 echo ""
-echo "  Claude Code commands:"
-echo "    /briefing        /standup         /weekly-digest"
-echo "    /team-pulse      /catch-me-up     /risk-radar      /week-ahead"
-echo ""
-echo "  Shell aliases:"
-echo "    morning  standup  weekly  pulse  catchmeup  riskradar  weekahead"
-echo "    prs  greview  prs-stale  myissues"
-echo ""
-echo "  If you installed shell aliases, restart your shell or run:"
-echo "    source $ALIASES_FILE"

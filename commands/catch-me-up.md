@@ -1,16 +1,23 @@
 # Catch Me Up
 
-You are briefing an engineer who has been out for multiple days and needs to get up to speed fast. They do not want to read through hundreds of notifications. They want the 2-minute version: what decisions were made, what broke, what shipped, and what they need to act on now that they are back.
+You are briefing someone who just got back. Maybe they were on PTO. Maybe they were out sick. Maybe they just had three days of back-to-back meetings and never looked at GitHub. Whatever the reason, they feel behind. They are staring at a wall of notifications and they do not know where to start.
 
-## Philosophy
+Your job is to make that feeling go away in two minutes.
 
-Returning from time off is disorienting. The goal here is to collapse N days of activity into a single prioritized document that answers:
-1. What do I need to act on TODAY? (things assigned to me, reviews piling up)
-2. What changed direction while I was out? (PRs that were reworked, issues reprioritized)
-3. What shipped that I should know about? (big merges, new repos, releases)
-4. What can I safely ignore? (routine merges, bot updates, minor fixes)
+You are not going to hand them a changelog. You are going to hand them a prioritized action plan: what needs their hands on it today, what changed direction while they were gone, and what shipped that they should know about. Structure it so they can stop reading after section 1 if they are in a hurry and still have everything they need to not look lost in their next meeting.
 
-Structure the output so the reader can stop reading after section 1 if they are in a hurry.
+Think of yourself as a trusted colleague who says: "Okay, here is what you missed. Three things need you. Two things changed. Everything else is moving fine."
+
+## The psychology of returning
+
+Returning from time off is disorienting. The natural instinct is to read every notification chronologically, which takes hours and creates anxiety without clarity. Your job is to collapse N days of activity into a single document that replaces that instinct.
+
+The structure matters:
+1. **ACT ON THIS** answers "What do I need to do TODAY?" If this section is empty, say so clearly. That alone is worth the price of admission.
+2. **BE AWARE** answers "What changed direction while I was out?" Only include things that would genuinely surprise them or that they will hear about in meetings.
+3. **FYI** answers "What shipped?" This is context, not action. Keep it tight.
+
+If the period was quiet, say so. "It was a quiet week. Nothing needs your immediate attention." That is a perfectly good briefing.
 
 ## Arguments
 
@@ -43,44 +50,50 @@ Determine the lookback window from $ARGUMENTS:
 - If a day name (e.g., "monday"), calculate the most recent occurrence
 - Compute the cutoff date/time in ISO format for `gh` queries
 
-### Step 2: Gather what needs your action (Section 1 - ACT ON THIS)
+### Step 2: Gather what needs their action (Section 1: ACT ON THIS)
 
-These are items that are waiting on YOU specifically:
+This is the most important section. Get it wrong and they miss something that is blocking a teammate. These are items waiting on THEM specifically:
 
 1. **Unread notifications (review requests and mentions only)**: `gh api notifications --jq '[.[] | select(.reason == "review_requested" or .reason == "mention") | {reason, title: .subject.title, repo: .repository.full_name, updated: .updated_at}]'`
-2. **PRs requesting your review that arrived during your absence**: `gh search prs --review-requested=@me --state=open --json repository,title,url,createdAt` - filter to those created or updated during the absence window
-3. **Issues assigned to you that were created or updated during absence**: `gh search issues --assignee=@me --state=open --json repository,title,url,labels,createdAt,updatedAt` - filter to those with activity during absence
-4. **Your own PRs that received reviews while you were out**: `gh search prs --author=@me --state=open --json repository,title,url,reviewDecision,updatedAt` - filter to those updated during absence, especially those with CHANGES_REQUESTED
+2. **PRs requesting their review that arrived during absence**: `gh search prs --review-requested=@me --state=open --json repository,title,url,createdAt` - filter to those created or updated during the absence window
+3. **Issues assigned to them that were created or updated during absence**: `gh search issues --assignee=@me --state=open --json repository,title,url,labels,createdAt,updatedAt` - filter to those with activity during absence
+4. **Their own PRs that received reviews while they were out**: `gh search prs --author=@me --state=open --json repository,title,url,reviewDecision,updatedAt` - filter to those updated during absence, especially those with CHANGES_REQUESTED
 
-Sort by urgency: changes-requested PRs first (you are blocking the merge), then review requests (you are blocking teammates), then new assignments.
+Sort by urgency: changes-requested PRs first (they are blocking the merge), then review requests (they are blocking teammates), then new assignments.
 
-### Step 3: Gather what changed direction (Section 2 - BE AWARE)
+For each item, include enough context that they know WHY it matters, not just WHAT it is. "Review requested: Fix memory leak in scheduler (4 days ago, blocking @alice from shipping)" is better than "Review requested: Fix memory leak in scheduler."
 
-1. **PRs in repos you contribute to that had significant discussion**: For your top repos, find PRs with 5+ comments that were active during your absence. Use: `gh pr list --repo <repo> --state all --json title,url,comments,updatedAt,state,author` - filter to those with high comment counts and activity during absence.
-2. **Issues with label changes**: Look for issues in your repos that were relabeled to/from "priority", "urgent", "blocked" during the absence window.
-3. **Large PRs that merged**: In your active repos, find merged PRs with significant changes: `gh pr list --repo <repo> --state merged --json title,url,mergedAt,additions,deletions,author` - filter to the absence window and sort by (additions + deletions) descending. Flag any with 500+ lines changed.
+### Step 3: Gather what changed direction (Section 2: BE AWARE)
 
-### Step 4: Gather what shipped (Section 3 - FYI)
+Only include things that would genuinely change how they think about current work:
 
-1. **All PRs merged in your active repos during the window**: For each of your top 5 recently pushed repos, `gh pr list --repo <repo> --state merged --json title,url,mergedAt,author` - filter to absence window
+1. **PRs with significant discussion**: For their top repos, find PRs with 5+ comments that were active during absence. Use: `gh pr list --repo <repo> --state all --json title,url,comments,updatedAt,state,author` - filter to those with high comment counts and activity during absence.
+2. **Issues with label changes**: Look for issues in their repos that were relabeled to/from "priority", "urgent", "blocked" during the absence window.
+3. **Large PRs that merged**: Find merged PRs with significant changes: `gh pr list --repo <repo> --state merged --json title,url,mergedAt,additions,deletions,author` - filter to the absence window and sort by (additions + deletions) descending. Flag any with 500+ lines changed.
+
+If nothing truly changed direction, say so. "Nothing notable changed direction during your absence." That is reassuring, not empty.
+
+### Step 4: Gather what shipped (Section 3: FYI)
+
+1. **All PRs merged in active repos during the window**: For each of the top 5 recently pushed repos, `gh pr list --repo <repo> --state merged --json title,url,mergedAt,author` - filter to absence window
 2. **New releases or tags**: `gh api repos/<repo>/releases --jq '[.[] | select(.published_at > "CUTOFF_DATE") | {tag: .tag_name, name: .name, url: .html_url}]'`
 3. **New repos created in the org**: If `--org` is provided, check for repos created during absence: `gh api orgs/<org>/repos?sort=created&per_page=5 --jq '[.[] | select(.created_at > "CUTOFF_DATE") | {name: .full_name, description: .description}]'`
 
-Consolidate routine items. If 10 PRs merged in one repo, group them: "[repo]: 10 PRs merged (highlight: [biggest PR title])". Only individually list PRs with 200+ lines changed or notable titles.
+Consolidate aggressively. If 10 PRs merged in one repo, do not list them all. Say "[repo]: 10 PRs merged (highlight: [biggest PR title])". Only individually list PRs with 200+ lines changed or notable titles.
 
 ### Step 5: Classify and cut
 
-Review all gathered items and enforce these rules:
-- If a merged PR was authored by dependabot/renovate, group all of them into one line: "[N] dependency updates merged across [repos]."
-- If an issue was created AND closed during the absence window, skip it unless it is labeled urgent. The user does not need to know about fully resolved incidents unless they were severe.
-- If the total "FYI" section would exceed 15 items, consolidate by repo: "[repo]: [N] PRs merged, [summary of biggest change]."
+- Dependabot/renovate PRs: one line total. "[N] dependency updates merged across [repos]."
+- Issues created AND closed during absence: skip unless labeled urgent. Fully resolved incidents do not need airtime unless they were severe.
+- If the "FYI" section would exceed 15 items, consolidate by repo.
 
 ### Step 6: Self-critique
 
 Before printing:
-- Is Section 1 (ACT ON THIS) complete? Missing a review request here means the user does not know they are blocking someone.
-- Is Section 2 (BE AWARE) genuinely important? Do not pad it with routine merges. If nothing truly changed direction, say "Nothing notable changed direction during your absence."
-- Is Section 3 (FYI) a useful summary and not a full changelog? Consolidate.
+- Is Section 1 (ACT ON THIS) complete? Missing a review request here means they unknowingly block someone all day. Get this right.
+- Is Section 2 (BE AWARE) genuinely important? Do not pad it with routine merges. Only things that would surprise them or come up in conversation.
+- Is Section 3 (FYI) a useful summary and not a full changelog?
+- Does the overall briefing feel like it respects their time? If they were out for 3 days, they should not need 5 minutes to read this.
 - Total output should be under 60 lines for a 3-day absence, up to 80 lines for a full week.
 - No em dashes anywhere.
 - Every URL is real. Never fabricate links.
@@ -91,7 +104,7 @@ Before printing:
 - DO NOT list every merged PR individually when there are more than 5 per repo. Summarize.
 - DO NOT include closed-then-reopened issues unless they are still open.
 - DO NOT say "while you were away, the team was busy." Just show what happened.
-- DO NOT add "welcome back" or similar pleasantries.
+- DO NOT add "welcome back" or similar pleasantries. They do not need warmth from a command. They need information.
 - DO NOT include items from before the absence window started.
 
 ## Output Format

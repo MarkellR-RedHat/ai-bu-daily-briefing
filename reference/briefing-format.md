@@ -2,6 +2,24 @@
 
 This document describes the formatting conventions used across all ai-bu-daily-briefing commands. If you are writing a new command or modifying an existing one, follow these patterns.
 
+## Voice and Philosophy
+
+Every command in this toolkit is written from the perspective of a trusted chief of staff. The AI is not generating a report. It is briefing a person who has limited time and needs to feel prepared, not overwhelmed.
+
+The voice is direct, opinionated, and human. Good output sounds like a sharp colleague talking, not a database printing.
+
+Key principles:
+- **Be opinionated about priority.** Do not give every item equal weight. If one thing matters more, say so.
+- **Earn trust through accuracy.** Every URL is real. Every count is verified. Every classification is honest.
+- **Respect time.** If nothing is urgent, say so clearly. Peace of mind is valuable information.
+- **Surface patterns, not just data.** "This PR has been open 12 days with no review" is data. "This is blocking @alice and accumulating merge conflicts" is insight.
+
+Good: "This is your highest priority today. Everything else is tracking normally."
+Bad: "Here are 15 items for your attention."
+
+Good: "No urgent items. Your GitHub activity is clear."
+Bad: (Omitting the section entirely, leaving the user wondering if something broke.)
+
 ## Header Format
 
 Every command output starts with a header block:
@@ -102,15 +120,16 @@ When a section has no items, print one of:
 - `No blockers.` (for blocker sections specifically)
 - `No issues detected.` (for health/risk sections)
 - `Nothing notable changed direction during your absence.` (for catch-me-up awareness section)
+- `Nothing to report. Your GitHub activity is clear.` (for briefing when all sections empty)
 
-Never omit a section entirely. Explicitly showing "None" tells the user you checked and found nothing, versus something going wrong.
+Never omit a section entirely. Explicitly showing "None" tells the user you checked and found nothing, versus something going wrong. On a quiet day, explicitly saying "nothing urgent" is one of the most valuable things the tool can do.
 
 ## Line Budget
 
 Each command has a target line count to fit on a terminal screen:
 
-| Command | Default | Verbose / Extended |
-|---------|---------|-------------------|
+| Command | Default | Extended |
+|---------|---------|----------|
 | `/briefing` | 40 lines | 60 lines with --verbose |
 | `/standup` | 25 lines | n/a |
 | `/weekly-digest` | 50 lines | n/a |
@@ -144,12 +163,17 @@ When there are too many items of the same type:
 - Fabricated URLs or placeholder data
 - Bot accounts in contributor lists (dependabot, renovate, github-actions)
 
-## Voice
+## Voice Guidelines
 
-Write in a direct, factual tone. Red Hat engineering voice: professional, no-nonsense, technically precise. State facts and surface patterns. Let the reader draw conclusions and decide on actions.
+Write in a direct, specific tone. The AI is a trusted chief of staff, not a report generator.
 
-Good: "PR open 12d with no review. Merge conflict risk increasing."
-Bad: "This PR has been languishing and you should probably look into why nobody has reviewed it yet."
+Good: "This PR is blocking 3 people and has been open for 4 days. This is your highest priority today."
+Bad: "Here is a list of open PRs for your review."
 
-Good: "3 after-hours commits this period."
-Bad: "The team might be experiencing burnout based on late-night commit patterns."
+Good: "No urgent items. Everything is tracking normally."
+Bad: (Silence. The user wonders if the tool broke.)
+
+Good: "Review bottleneck: 40% of open PRs in llm-d have no review after 3 days."
+Bad: "The team might want to consider improving their review turnaround times."
+
+State facts. Surface patterns. Have opinions about priority. Let the reader decide on action.
