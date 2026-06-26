@@ -86,7 +86,7 @@ prs() {
   fi
 
   echo "PRs requesting your review:"
-  echo "----------------------------"
+  echo "============================"
   gh search prs --review-requested=@me --state=open $owner_flag \
     --json repository,title,url,updatedAt \
     --template '{{range .}}{{.repository.nameWithOwner}} | {{.title}}
@@ -148,7 +148,7 @@ prs-stale() {
   cutoff=$(date -v-7d +%Y-%m-%dT00:00:00Z 2>/dev/null || date -d '7 days ago' +%Y-%m-%dT00:00:00Z)
 
   echo "Stale PRs (open >7 days, requesting your review):"
-  echo "---------------------------------------------------"
+  echo "==================================================="
   gh search prs --review-requested=@me --state=open $owner_flag \
     --created="<$cutoff" \
     --json repository,title,url,createdAt \
@@ -171,7 +171,7 @@ myissues() {
   fi
 
   echo "Issues assigned to you:"
-  echo "------------------------"
+  echo "========================"
   gh search issues --assignee=@me --state=open $owner_flag \
     --json repository,title,url,labels,updatedAt \
     --template '{{range .}}{{.repository.nameWithOwner}} | {{.title}}{{range .labels}} [{{.name}}]{{end}}

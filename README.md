@@ -6,7 +6,7 @@ You have a standup in 13 minutes. What happened yesterday?
 
 You open GitHub. Twelve notifications. You scan each one, open four tabs, cross-reference PRs across two repos, try to remember what you shipped versus what you just looked at. You tab over to Slack to see if anyone pinged you. Tab back. Forget about the issue that got labeled urgent while you were asleep. Show up to standup and say "uh, I worked on the autoscaler thing."
 
-There is a better way.
+This tool replaces that routine with a single command.
 
 ## Quick start
 
@@ -184,6 +184,27 @@ source /path/to/ai-bu-daily-briefing/shell/briefing-aliases.sh
 **Stale thresholds.** PRs open >7 days are flagged as STALE. Issues open >14 days are flagged as OLD. These thresholds are defined in each command file and can be edited to match your team's norms.
 
 **Adding new commands.** Command files are plain Markdown with structured prompts for Claude. See `reference/briefing-format.md` for formatting conventions. Add a new `.md` file to `commands/`, update the `COMMANDS` array in `install.sh`, and re-run the installer.
+
+## Workflows
+
+**Monday morning ritual.** Run `/briefing` first, then `/week-ahead` to turn the backlog into a sequenced plan. Takes about 90 seconds total and replaces the 15-minute tab-juggle.
+
+**After PTO.** Run `/catch-me-up 5` to collapse a week of notifications into three sections: act on this, be aware, FYI. One engineer on our team came back from a week of PTO, ran this command, and walked into her first meeting sounding like she had never left. The whole catch-up took less time than reading her email would have.
+
+**Friday wrap-up.** Run `/weekly-digest`, then paste it into your status update or 1:1 doc. Pair it with [/status-report](https://github.com/MarkellR-RedHat/ai-bu-status-report) if your manager wants the narrative version.
+
+**Preparing a talk about your work.** Run `/weekly-digest --weeks 4` to pull a month of shipped work, then feed that into [/slide-outliner](https://github.com/MarkellR-RedHat/ai-bu-slide-outliner) to structure the story.
+
+## Works with other AI BU tools
+
+| When you finish with... | Try next... | Why |
+|---|---|---|
+| `/weekly-digest` | [/status-report](https://github.com/MarkellR-RedHat/ai-bu-status-report) | Generate a narrative status from the same data |
+| `/risk-radar` | [/upstream-tracker](https://github.com/MarkellR-RedHat/ai-bu-upstream-tracker) | Track risks across upstream dependencies |
+| `/team-pulse` | [/shipped-digest](https://github.com/MarkellR-RedHat/ai-bu-shipped-digest) | Share the team's wins in a broader digest |
+| `/standup` | [/message-polisher](https://github.com/MarkellR-RedHat/ai-bu-message-polisher) | Polish your standup before posting to Slack |
+
+Part of the [AI BU tools suite](https://github.com/MarkellR-RedHat/ai-bu-hub), 18 Claude Code extensions for engineering teams.
 
 ## How it works
 
