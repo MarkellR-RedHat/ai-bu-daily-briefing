@@ -1,54 +1,57 @@
 # Standup Prep
 
-Generate a quick standup summary based on my recent GitHub activity. Output three sections: what I did yesterday, what I'm doing today, and blockers.
+Generate a quick standup summary from my GitHub activity. Three sections only: yesterday, today, blockers. Keep total output under 25 lines.
+
+## Rules
+
+- Bullet points only. No prose, no filler, no encouragement.
+- One line per item. Include repo name and PR/issue title.
+- Do NOT explain what you are doing. Just print the standup.
+- If a section is empty, print "- Nothing" and move on.
 
 ## Instructions
 
-$ARGUMENTS can optionally contain an org or repo filter.
+$ARGUMENTS can optionally contain `--org <name>` or `--repo <name>` to filter.
 
-### What I Did Yesterday
+### Yesterday (last 24h)
 
-1. Run `gh search prs --author=@me --merged --json repository,title,url,mergedAt` and filter to PRs merged in the last 24 hours.
-2. Run `gh search prs --author=@me --state=open --json repository,title,url,updatedAt` and filter to PRs updated in the last 24 hours.
-3. Run `gh search issues --author=@me --json repository,title,url,updatedAt` and filter to issues updated in the last 24 hours.
-4. Check recent commits by running `gh api user/events --jq '[.[] | select(.type == "PushEvent") | {repo: .repo.name, created: .created_at, commits: .payload.commits | length}] | .[:10]'`.
+1. PRs I merged: `gh search prs --author=@me --merged --json repository,title,url,mergedAt` - filter to last 24h.
+2. PRs I updated: `gh search prs --author=@me --state=open --json repository,title,url,updatedAt` - filter to last 24h.
+3. Issues I touched: `gh search issues --author=@me --json repository,title,url,updatedAt` - filter to last 24h.
+4. Push events: `gh api user/events --jq '[.[] | select(.type == "PushEvent") | {repo: .repo.name, created: .created_at, commits: .payload.commits | length}] | .[:10]'`
 
-Summarize all activity into bullet points.
+### Today
 
-### What I'm Doing Today
+1. My PRs awaiting review: `gh search prs --author=@me --state=open --review=required --json repository,title,url`
+2. My assigned issues: `gh search issues --assignee=@me --state=open --sort=updated --json repository,title,url,labels`
+3. PRs requesting my review: `gh search prs --review-requested=@me --state=open --json repository,title,url`
 
-1. List my open PRs that still need review: `gh search prs --author=@me --state=open --review=required --json repository,title,url`.
-2. List my assigned issues sorted by most recently updated: `gh search issues --assignee=@me --state=open --sort=updated --json repository,title,url,labels`.
-3. List PRs requesting my review: `gh search prs --review-requested=@me --state=open --json repository,title,url`.
-
-Prioritize items with urgent/deadline labels and pending review requests.
+Urgent/deadline-labeled items go first.
 
 ### Blockers
 
-1. Check for PRs where I am the author and reviews are pending for more than 3 days: `gh search prs --author=@me --state=open --json repository,title,url,createdAt,reviewDecision`.
-2. Check for any issues assigned to me with a "blocked" label.
+1. My PRs waiting on review for 3+ days: `gh search prs --author=@me --state=open --json repository,title,url,createdAt,reviewDecision`
+2. Issues assigned to me with a "blocked" label.
 
-If no blockers are found, say "No blockers."
+If nothing qualifies, print "- No blockers."
 
-### Output Format
+## Output Format
 
 ```
-STANDUP PREP - [today's date]
-=============================
+STANDUP - [YYYY-MM-DD]
+=======================
 
 YESTERDAY:
-- Merged PR: [title] in [repo]
-- Updated PR: [title] in [repo]
-- Worked on issue: [title] in [repo]
+- Merged: [title] ([repo])
+- Updated: [title] ([repo])
+- Pushed [N] commits to [repo]
 
 TODAY:
-- Review PR: [title] in [repo] (requested)
-- Continue: [issue title] in [repo]
-- Follow up on: [PR title] (awaiting review)
+- Review: [title] ([repo]) [requested]
+- Continue: [title] ([repo])
+- Ship: [title] ([repo]) [approved]
 
 BLOCKERS:
-- [PR title] in [repo] waiting on review for [N] days
+- [title] ([repo]) - waiting [N]d for review
 - No blockers.
 ```
-
-Keep this tight. Three sections, bullet points only.

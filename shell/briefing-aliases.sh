@@ -22,6 +22,26 @@ standup() {
   claude "/standup $*"
 }
 
+# Weekly digest via Claude Code
+# Usage: weekly [--org OrgName] [--repo repo-name]
+weekly() {
+  if ! command -v claude &> /dev/null; then
+    echo "Error: claude CLI not found. Install Claude Code first."
+    return 1
+  fi
+  claude "/weekly-digest $*"
+}
+
+# Team pulse via Claude Code
+# Usage: pulse --org OrgName [--days 7]
+pulse() {
+  if ! command -v claude &> /dev/null; then
+    echo "Error: claude CLI not found. Install Claude Code first."
+    return 1
+  fi
+  claude "/team-pulse $*"
+}
+
 # Quick list of PRs needing your review
 # Usage: prs [org-name]
 prs() {
@@ -47,6 +67,64 @@ prs() {
     echo "Failed to fetch PRs. Check your gh auth status."
     return 1
   fi
+}
+
+# Interactive PR review picker (requires fzf)
+# Usage: greview [org-name]
+greview() {
+  if ! command -v gh &> /dev/null; then
+    echo "Error: gh CLI not found. Install GitHub CLI first."
+    return 1
+  fi
+  if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf not found. Install fzf first: brew install fzf"
+    return 1
+  fi
+
+  local owner_flag=""
+  if [ -n "$1" ]; then
+    owner_flag="--owner=$1"
+  fi
+
+  local selected
+  selected=$(gh search prs --review-requested=@me --state=open $owner_flag \
+    --json repository,title,url,number \
+    --jq '.[] | "\(.repository.nameWithOwner) #\(.number) \(.title)\t\(.url)"' \
+    | fzf --delimiter='\t' --with-nth=1 --preview-window=hidden \
+           --header="Select a PR to review (enter to open)")
+
+  if [ -n "$selected" ]; then
+    local url
+    url=$(echo "$selected" | awk -F'\t' '{print $2}')
+    echo "Opening: $url"
+    open "$url" 2>/dev/null || xdg-open "$url" 2>/dev/null || echo "$url"
+  fi
+}
+
+# Show PRs older than 7 days
+# Usage: prs-stale [org-name]
+prs-stale() {
+  if ! command -v gh &> /dev/null; then
+    echo "Error: gh CLI not found. Install GitHub CLI first."
+    return 1
+  fi
+
+  local owner_flag=""
+  if [ -n "$1" ]; then
+    owner_flag="--owner=$1"
+  fi
+
+  local cutoff
+  cutoff=$(date -v-7d +%Y-%m-%dT00:00:00Z 2>/dev/null || date -d '7 days ago' +%Y-%m-%dT00:00:00Z)
+
+  echo "Stale PRs (open >7 days, requesting your review):"
+  echo "---------------------------------------------------"
+  gh search prs --review-requested=@me --state=open $owner_flag \
+    --created="<$cutoff" \
+    --json repository,title,url,createdAt \
+    --template '{{range .}}{{.repository.nameWithOwner}} | {{.title}} (created {{.createdAt}})
+  {{.url}}
+{{end}}'
 }
 
 # List your assigned issues across repos
